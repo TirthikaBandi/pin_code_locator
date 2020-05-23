@@ -1,0 +1,56 @@
+import pandas as py
+import numpy as np
+from math import cos, sin, sqrt, asin
+
+#function for shortlisting the store code in terms of distance when provided with latitude and longitude
+
+def distanceFromTo(latitude1,longitude1,latitude2,longitude2,km):
+    latitude1  = np.deg2rad(latitude1)
+    longitude1 = np.deg2rad(longitude1)
+    latitude2  = np.deg2rad(latitude2)
+    longitude2 = np.deg2rad(longitude2)
+    delta_latitude  = latitude2  - latitude1
+    delta_longitude = longitude2 - longitude1
+        
+    a = sin(delta_latitude / 2)**2 + cos(latitude1) * cos(latitude2) * sin(delta_longitude / 2)**2
+  
+    c = 2 * asin(sqrt(a))  
+      
+    r = 6371
+       
+    distance = c * r
+    # if the distance calculated is less than the specified radius it will marked true 
+    if distance<=km:
+        return "1"
+    else:
+        return "0"
+
+#code for reading latitude and longitude column from the store codes file
+
+c=py.read_csv("Pilot_stores.csv",encoding='latin1')
+latitude1=np.array(c['Latitude'])
+longitude1=np.array(c['Longitude'])
+pincode=np.array(c['PIN CODE'])
+code=np.array(c['Site Code'])
+
+#code for reading latitude and longitude column from the indian pin codes file
+
+b=py.read_csv("indian_pincodes.csv",encoding='latin1')
+latitude2=np.array(b['latitude'])
+longitude2=np.array(b['longitude'])
+pin=np.array(b['Pincode'])
+
+km=10 # the radius here is hardcoded as 10 but can be change according to requirement
+
+#code for printing the stores pincode within a limited radius 
+
+for i in range(len(latitude1)):
+    x=[]
+    print("store id = ",code[i],end="------")
+    print("store pin = ",pincode[i])
+    for j in range(len(latitude2)):
+        check = distanceFromTo(latitude1[i],longitude1[i],latitude2[j],longitude2[j],km)
+        if check == "1":
+            if pin[j] not in x:
+                x.append(pin[j])
+                print("\tpincode :",pin[j])
